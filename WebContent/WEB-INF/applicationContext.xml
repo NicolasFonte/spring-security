@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:b="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/livro.xhtml" access="hasRole('Admin')" />
+		<intercept-url pattern="/autor.xhtml" access="hasRole('Admin')" />
+		<logout logout-success-url="/login.xhtml" />
+		<form-login login-page="/login.xhtml"
+			authentication-failure-url="/login.xhtml?erro=true"
+			default-target-url="/livro.xhtml"
+			 />
+	</http>
+
+	<authentication-manager>
+		<authentication-provider>
+			<jdbc-user-service data-source-ref="dataSourceMysql"
+				users-by-username-query="SELECT username, password, enable FROM Usuario WHERE username=?"
+				authorities-by-username-query= "SELECT  Usuario.username, Autorizacao.nome FROM Usuario_Autorizacao, Usuario, Autorizacao WHERE  Usuario.id = Usuario_Autorizacao.Usuario_id 
+				and Usuario_Autorizacao.autorizacoes_id = Autorizacao.id and  Usuario.username =?" />
+		</authentication-provider>
+	</authentication-manager>
+
+	<b:bean id="dataSourceMysql"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<b:property name="url" value="jdbc:mysql://localhost:3306/livrariadb" />
+		<b:property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<b:property name="username" value="root" />
+		<b:property name="password" value="root" />
+	</b:bean>
+	
+	<b:bean id="dataSourcePostgres"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<b:property name="url" value="jdbc:postgresql://localhost:5432/livrariadb" />
+		<b:property name="driverClassName" value="org.postgresql.Driver" />
+		<b:property name="username" value="postgres" />
+		<b:property name="password" value="root" />
+	</b:bean>
+	
+
+</b:beans>

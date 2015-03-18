@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="_template.xhtml">
+	<ui:define name="titulo">
+		Adicionar Livro Novo
+	</ui:define>
+	
+	<ui:define name="conteudo">
+		<h:form>
+			<p:messages id="messages" autoUpdate="true" />
+			<p:growl autoUpdate="true" />
+			<p:fieldset legend="Dados do Livro">
+				<h:panelGrid columns="2">
+
+					<h:outputLabel value="Titulo:" for="titulo" />
+					<h:inputText id="titulo" value="#{livroBean.livro.titulo}"
+						required="true" requiredMessage="Titulo Obrigatorio"
+						validatorMessage="Titulo nao pode ser maior do que 40 caracteres">
+						<f:validateLength maximum="40" />
+						<f:ajax event="blur" />
+						<!-- attribute render omitted due primefaces autoUpdate -->
+						<!-- evento blur utilizado na perca de foco -->
+					</h:inputText>
+					<h:outputLabel value="ISBN:" for="isbn" />
+					<!-- h:inputText id="isbn" value="#{livroBean.livro.isbn}"
+						validator="#{livroBean.comecaComDigitoUm}">
+						<f:ajax event="blur" render="messages" />
+					</h:inputText NATIVE FACELETS -->
+					<p:inputMask id="isbn" value="#{livroBean.livro.isbn}"
+						validator="#{livroBean.comecaComDigitoUm}" mask="9-999-999" />
+					<h:outputLabel value="Preço:" for="preco" />
+					<h:inputText id="preco" value="#{livroBean.livro.preco}" />
+					<h:outputLabel value="Data de Lançamento:" for="dataLancamento" />
+					<!--  h:inputText id="dataLancamento"
+						value="#{livroBean.livro.dataLancamento.time}">
+						<f:convertDateTime pattern="dd/MM/yyyy"
+							timeZone="America/Sao_Paulo" />
+					</h:inputText NATIVE FACELETS -->
+					<p:calendar id="dataLancamento"
+						value="#{livroBean.livro.dataLancamento.time}"
+						pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" />
+				</h:panelGrid>
+			</p:fieldset>
+
+			<p:fieldset legend="Dados do Autor">
+				<h:outputLabel value="Selecione Autor" for="autor">
+				</h:outputLabel>
+				<h:selectOneMenu value="#{livroBean.autorId}" id="autor">
+					<f:selectItems value="#{livroBean.autores}" var="autor"
+						itemLabel="#{autor.nome}" itemValue="#{autor.id}" />
+				</h:selectOneMenu>
+				<!--  h:commandButton value="Adicionar Autor"
+					action="#{livroBean.associarAutor}">
+					<f:ajax execute="autor" render="tabelaAutores" />
+				</h:commandButton NATIVE FACELETS WITH AJAX -->
+
+				<p:commandButton value="Adicionar Autor" process="@this autor"
+					update="tabelaAutores" />
+
+				<h:dataTable value="#{livroBean.autoresDoLivro}" var="autor"
+					id="tabelaAutores">
+					<h:column>
+						<h:outputText value="#{autor.nome}" />
+					</h:column>
+				</h:dataTable>
+				<h:commandLink value="Cadastrar novo autor"
+					action="#{livroBean.formAutor}" immediate="true" />
+				<!-- autor.xhtml: Pulando fases JSF -->
+			</p:fieldset>
+			<h:commandButton value="Gravar Livro" action="#{livroBean.gravar}">
+				<f:ajax execute="@form" render="@form :tabelaLivros" />
+			</h:commandButton>
+		</h:form>
+
+		<h1>Lista de Livros ja cadastrados</h1>
+		<!-- We can change h:dataTable to p:datatable (also p:column) and add paginator=true and rows=4 and emptyMessage="Mensagem Quando não há livro" -->
+		<h:dataTable value="#{livroBean.livros}" var="livro" id="tabelaLivros">
+			<h:column>
+				<f:facet name="Header">Titulo</f:facet>
+				<h:outputText value="#{livro.titulo}" />
+			</h:column>
+			<h:column>
+				<f:facet name="Header">ISBN</f:facet>
+				<h:outputText value="#{livro.isbn}" />
+			</h:column>
+			<h:column>
+				<f:facet name="Header">Preco</f:facet>
+				<h:outputText value="#{livro.preco}" />
+			</h:column>
+		</h:dataTable>
+	</ui:define>
+</ui:composition>
+</html>
